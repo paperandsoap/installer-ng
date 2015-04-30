@@ -1,6 +1,15 @@
+etc = "#{node[:scalr_server][:install_root]}/etc"
+
+directory "#{etc}/logrotate" do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+end
+
 # logrotate config file
 log = "#{node[:scalr_server][:install_root]}/var/log/scalr"
-config = "#{node[:scalr_server][:install_root]}/etc/logrotate/config"
+config = "#{etc}/logrotate/config"
 
 template config do
   source 'logrotate/config.erb'
@@ -10,7 +19,7 @@ end
 
 # cronjob for logrotate
 cmd = "#{node[:scalr_server][:install_root]}/embedded/sbin/logrotate"
-cron_file = "#{node[:scalr_server][:install_root]}/etc/cron/cron.d/logrotate"
+cron_file = "#{etc}/cron/cron.d/logrotate"
 
 template cron_file do
   source 'logrotate/cron.erb'

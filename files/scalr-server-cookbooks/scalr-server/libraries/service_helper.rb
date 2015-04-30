@@ -245,6 +245,11 @@ module Scalr
         return true
       end
 
+      # Logrotate is always enabled.
+      if mod == :logrotate
+        return true
+      end
+
       if mod == :crond
         return enable_module?(node, :cron) || enable_module?(node, :logrotate)
       end
