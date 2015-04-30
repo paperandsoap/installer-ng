@@ -1,26 +1,3 @@
-# TODO - cron user.
-# Create logging directory
-directory "#{log_dir_for node, 'cron'}" do
-  owner 'root'  # cron runs as root.
-  mode 0755
-end
-
-# Create all the cron wrapper scripts (to set environment, etc.), and cron files.
-directory bin_dir_for(node, 'cron') do
-  owner 'root'  # cron runs as root.
-  mode 0755
-end
-
-directory etc_dir_for(node, 'cron') do
-  owner 'root'  # cron runs as root.
-  mode 0755
-end
-
-directory "#{etc_dir_for node, 'cron'}/cron.d" do
-  owner 'root'  # cron runs as root.
-  mode 0755
-end
-
 php = "#{node[:scalr_server][:install_root]}/embedded/bin/php -c #{etc_dir_for node, 'php'} -q"
 og_cmd = "#{php} #{node[:scalr_server][:install_root]}/embedded/scalr/app/cron/cron.php"
 ng_cmd = "#{php} #{node[:scalr_server][:install_root]}/embedded/scalr/app/cron-ng/cron.php"

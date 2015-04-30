@@ -1,4 +1,4 @@
-supervisor_service 'cron' do
+supervisor_service 'crond' do
   command         "#{node[:scalr_server][:install_root]}/embedded/sbin/crond" \
                   " -L #{log_dir_for node, 'cron'}/crond.log" \
                   " -s #{etc_dir_for node, 'cron'}/cron.d" \

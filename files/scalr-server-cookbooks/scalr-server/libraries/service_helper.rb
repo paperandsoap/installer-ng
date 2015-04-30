@@ -245,6 +245,10 @@ module Scalr
         return true
       end
 
+      if mod == :crond
+        return enable_module?(node, :cron) || enable_module?(node, :logrotate)
+      end
+
       # App is enabled if anything that requires the app user is enabled.
       if mod == :app
         %w{cron rrd service web}.each do |dependent_mod|

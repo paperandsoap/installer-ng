@@ -6,9 +6,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends python python-pip && \
     rm -rf /var/lib/apt/lists/*
 
-ADD ./scalr-user-client-${CLIENT_VERSION}.tar.gz /
+ADD ./scalr-client-${CLIENT_VERSION}.tar.gz /
 
-RUN cd "/scalr-user-client-${CLIENT_VERSION}" && \
+RUN cd "./scalr-client-${CLIENT_VERSION}" && \
     python setup.py install --single-version-externally-managed --root=/
 
 ADD ./test-script.py /
