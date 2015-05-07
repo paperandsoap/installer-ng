@@ -70,8 +70,8 @@ describe Scalr::ServiceHelper do
     it 'should return the right crons' do
       node.set[:scalr_server][:cron][:enable] = true
       node.set[:scalr_server][:cron][:disable] = []
-      expect(dummy_class.new.enabled_crons(node).length).to eq(1)
-      expect(dummy_class.new.disabled_crons(node).length).to eq(18)
+      expect(dummy_class.new.enabled_crons(node).length).to eq(0)
+      expect(dummy_class.new.disabled_crons(node).length).to eq(19)
     end
 
     it 'should support false' do
@@ -83,24 +83,21 @@ describe Scalr::ServiceHelper do
   end
 
   describe '#enable_module?' do
-    it 'should always enable some modules' do
-      %w{supervisor dirs users sysctl}.each do |mod|
-        expect(dummy_class.new.enable_module?(node, mod.to_sym)).to be_truthy
-        expect(dummy_class.new.enable_module?(node, mod)).to be_truthy
-      end
-    end
+     it 'should always enable supervisor' do
+       expect(dummy_class.new.enable_module?(node, :supervisor)).to eq(true)
+       expect(dummy_class.new.enable_module?(node, 'supervisor')).to eq(true)
+     end
 
     it 'should special-case app' do
       # Check with all modules off
       node.set[:scalr_server][:enable_all] = false
-      node.set[:scalr_server][:proxy][:enable] = true
-      %w{web rrd cron service}.each do |mod|
+      %w{web proxy rrd cron service}.each do |mod|
         node.set[:scalr_server][mod][:enable] = false
       end
       expect(dummy_class.new.enable_module?(node, :app)).to eq(false)
 
       # Check them one by one
-      %w{web rrd cron service}.each do |mod|
+      %w{web proxy rrd cron service}.each do |mod|
         node.set[:scalr_server][mod][:enable] = true
         expect(dummy_class.new.enable_module?(node, :app)).to eq(true)
         node.set[:scalr_server][mod][:enable] = false
@@ -113,144 +110,31 @@ describe Scalr::ServiceHelper do
       node.set[:scalr_server][:enable_all] = true
       expect(dummy_class.new.enable_module?(node, :app)).to eq(true)
     end
+  end
 
-    it 'should special-case httpd' do
-      %w{web proxy}.each do |mod|
-        node.set[:scalr_server][mod][:enable] = true
-        expect(dummy_class.new.enable_module?(node, :httpd)).to eq(true)
-        node.set[:scalr_server][mod][:enable] = false
-      end
-
-      node.set[:scalr_server][:enable_all] = false
-      expect(dummy_class.new.enable_module?(node, :httpd)).to eq(false)
-
-      node.set[:scalr_server][:enable_all] = true
+  it 'should special-case httpd' do
+    %w{web proxy}.each do |mod|
+      node.set[:scalr_server][mod][:enable] = true
       expect(dummy_class.new.enable_module?(node, :httpd)).to eq(true)
+      node.set[:scalr_server][mod][:enable] = false
     end
 
-    it 'should work for other modules' do
-      node.set[:scalr_server][:enable_all] = false
-      node.set[:scalr_server][:mysql][:enable] = true
-      expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(true)
+    node.set[:scalr_server][:enable_all] = false
+    expect(dummy_class.new.enable_module?(node, :httpd)).to eq(false)
 
-      node.set[:scalr_server][:mysql][:enable] = false
-      expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(false)
-
-      node.set[:scalr_server][:enable_all] = true
-      expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(true)
-    end
+    node.set[:scalr_server][:enable_all] = true
+    expect(dummy_class.new.enable_module?(node, :httpd)).to eq(true)
   end
 
-  describe '#memcached_servers' do
+  it 'should work for other modules' do
+    node.set[:scalr_server][:enable_all] = false
+    node.set[:scalr_server][:mysql][:enable] = true
+    expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(true)
 
-    it 'should return Memcached Servers when it\'s the only thing set' do
-      servers = %w{mc-1:123 mc-2:456}
-      node.set[:scalr_server][:app][:memcached_servers] = servers
-      expect(dummy_class.new.memcached_servers(node)).to eq(servers)
-    end
+    node.set[:scalr_server][:mysql][:enable] = false
+    expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(false)
 
-    it 'should return the legacy setting when they are set' do
-      node.set[:scalr_server][:app][:memcached_servers] = %w{mc-1:123 mc2-456}
-      node.set[:scalr_server][:app][:memcached_host] = 'mc'
-      node.set[:scalr_server][:app][:memcached_port] = 11211
-
-      expect(dummy_class.new.memcached_servers(node)).to eq(%w{mc:11211})
-    end
-  end
-
-  describe '#memcached_enable_sasl?' do
-    it 'should be enabled by the override' do
-      node.set[:scalr_server][:memcached][:enable_sasl] = true
-      node.set[:scalr_server][:memcached][:bind_host] = '127.0.0.1'
-      expect(dummy_class.new.memcached_enable_sasl?(node)).to be_truthy
-    end
-
-    it 'should be disabled by the override' do
-      node.set[:scalr_server][:memcached][:enable_sasl] = false
-      node.set[:scalr_server][:memcached][:bind_host] = '0.0.0.0'
-      expect(dummy_class.new.memcached_enable_sasl?(node)).to be_falsey
-    end
-
-    it 'should be enabled if there is no override and Memcached is binding on a public IP' do
-      node.set[:scalr_server][:memcached][:enable_sasl] = nil
-      node.set[:scalr_server][:memcached][:bind_host] = '0.0.0.0'
-      expect(dummy_class.new.memcached_enable_sasl?(node)).to be_truthy
-    end
-
-    it 'should be disabled if there is no override and Memcached is binding on 127.0.0.1' do
-      node.set[:scalr_server][:memcached][:enable_sasl] = nil
-      node.set[:scalr_server][:memcached][:bind_host] = '127.0.0.1'
-      expect(dummy_class.new.memcached_enable_sasl?(node)).to be_falsey
-    end
-  end
-
-  describe '#graphics_scheme' do
-    it 'should default to the endpoint_scheme' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      expect(dummy_class.new.graphics_scheme(node)).to eq('https')
-    end
-
-    it 'should respect the override' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      node.set[:scalr_server][:routing][:graphics_scheme] = 'http'
-      expect(dummy_class.new.graphics_scheme(node)).to eq('http')
-    end
-  end
-
-  describe '#graphics_host' do
-    it 'should default to the endpoint_scheme' do
-      node.set[:scalr_server][:routing][:endpoint_host] = 'example.com'
-      expect(dummy_class.new.graphics_host(node)).to eq('example.com')
-    end
-
-    it 'should respect the override' do
-      node.set[:scalr_server][:routing][:endpoint_host] = 'example.com'
-      node.set[:scalr_server][:routing][:graphics_host] = 'graphics.com'
-      expect(dummy_class.new.graphics_host(node)).to eq('graphics.com')
-    end
-  end
-
-  describe '#plotter_scheme' do
-    it 'should default to the endpoint_scheme' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      expect(dummy_class.new.plotter_scheme(node)).to eq('https')
-    end
-
-    it 'should respect the override' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      node.set[:scalr_server][:routing][:plotter_scheme] = 'http'
-      expect(dummy_class.new.plotter_scheme(node)).to eq('http')
-    end
-  end
-
-  describe '#plotter_host' do
-    it 'should default to the endpoint_scheme' do
-      node.set[:scalr_server][:routing][:endpoint_host] = 'example.com'
-      expect(dummy_class.new.plotter_host(node)).to eq('example.com')
-    end
-
-    it 'should respect the override' do
-      node.set[:scalr_server][:routing][:endpoint_host] = 'example.com'
-      node.set[:scalr_server][:routing][:plotter_host] = 'plotter.com'
-      expect(dummy_class.new.plotter_host(node)).to eq('plotter.com')
-    end
-  end
-
-  describe '#plotter_port' do
-    it 'should default to 443 for https' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      expect(dummy_class.new.plotter_port(node)).to eq(443)
-    end
-
-    it 'should default to 80 for http' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'http'
-      expect(dummy_class.new.plotter_port(node)).to eq(80)
-    end
-
-    it 'should respect the override' do
-      node.set[:scalr_server][:routing][:endpoint_scheme] = 'https'
-      node.set[:scalr_server][:routing][:plotter_port] = 8000
-      expect(dummy_class.new.plotter_port(node)).to eq(8000)
-    end
+    node.set[:scalr_server][:enable_all] = true
+    expect(dummy_class.new.enable_module?(node, 'mysql')).to eq(true)
   end
 end

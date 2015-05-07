@@ -176,6 +176,7 @@ module Scalr
           {:hour => '*',    :minute => '*/2',  :ng => false, :name => 'BundleTasksManager'},
           {:hour => '*',    :minute => '*/15', :ng => true,  :name => 'MetricCheck'},
           {:hour => '*',    :minute => '*/2',  :ng => true,  :name => 'Poller'},
+          {:hour => '*',    :minute => '*/2',  :ng => false, :name => 'EBSManager'},
           {:hour => '*',    :minute => '*/20', :ng => false, :name => 'RolesQueue'},
           {:hour => '*',    :minute => '*/5',  :ng => true,  :name => 'DbMsrMaintenance'},
           {:hour => '*',    :minute => '*/20', :ng => true,  :name => 'LeaseManager'},
@@ -194,9 +195,7 @@ module Scalr
     end
 
     def _all_crons
-      [
-          {:hour => '*',    :minute => '*/10',  :ng => false, :name => 'EBSManager'},
-      ]
+      []
     end
 
     def enabled_crons(node)
@@ -241,13 +240,13 @@ module Scalr
       mod = mod.to_sym
 
       # Supervisor is always enabled.
-      if %i{supervisor dirs users sysctl}.include? mod
+      if mod == :supervisor
         return true
       end
 
       # App is enabled if anything that requires the app user is enabled.
       if mod == :app
-        %w{cron rrd service web}.each do |dependent_mod|
+        %w{cron rrd service web proxy}.each do |dependent_mod|
           if enable_module?(node, dependent_mod)
             return true
           end
@@ -285,76 +284,6 @@ module Scalr
 
     def service_is_up?(node, svc)
       service_exists?(node, svc) && (%w{RUNNING STARTING}.include? service_status(node, svc))
-    end
-
-
-    #####################
-    # Memcached helpers #
-    #####################
-
-    def memcached_servers(node)
-      if node[:scalr_server][:app][:memcached_host].nil? && node[:scalr_server][:app][:memcached_port].nil?
-        node[:scalr_server][:app][:memcached_servers]
-      else
-        ["#{node[:scalr_server][:app][:memcached_host]}:#{node[:scalr_server][:app][:memcached_port]}",]
-      end
-    end
-
-    def memcached_enable_sasl?(node)
-      if node[:scalr_server][:memcached][:enable_sasl].nil?
-        return node[:scalr_server][:memcached][:bind_host] != '127.0.0.1'
-      end
-      !! node[:scalr_server][:memcached][:enable_sasl]
-    end
-
-    #################
-    # MySQL helpers #
-    #################
-
-    def mysql_bootstrap_status_file(node)
-      "#{data_dir_for node, 'mysql'}/bootstrapped"
-    end
-
-    def mysql_bootstrapped?(node)
-      if node[:mysql_bootstrap_status].nil?
-        node.override[:mysql_bootstrap_status] = File.exists?(mysql_bootstrap_status_file node)
-      end
-      node[:mysql_bootstrap_status]
-    end
-
-
-    #################
-    # SSMTP helpers #
-    #################
-
-    def ssmtp_use?(node)
-      ! node[:scalr_server][:app][:email_mailserver].nil?
-    end
-
-
-    ####################
-    # Endpoint helpers #
-    ####################
-
-    def graphics_scheme(node)
-      node[:scalr_server][:routing][:graphics_scheme] || node[:scalr_server][:routing][:endpoint_scheme]
-    end
-
-    def graphics_host(node)
-      node[:scalr_server][:routing][:graphics_host] || node[:scalr_server][:routing][:endpoint_host]
-    end
-
-    def plotter_scheme(node)
-      node[:scalr_server][:routing][:plotter_scheme] || node[:scalr_server][:routing][:endpoint_scheme]
-
-    end
-
-    def plotter_host(node)
-      node[:scalr_server][:routing][:plotter_host] || node[:scalr_server][:routing][:endpoint_host]
-    end
-
-    def plotter_port(node)
-      node[:scalr_server][:routing][:plotter_port] || (node[:scalr_server][:routing][:endpoint_scheme] == 'https' ? 443 : 80)
     end
 
   end

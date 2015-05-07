@@ -31,24 +31,13 @@ file init_file do
   action  :create_if_missing
 end
 
-directory run_dir_for(node, 'supervisor') do
-  owner node[:scalr_server][:supervisor][:user]
-  mode 0755
-end
 
-directory log_dir_for(node, 'supervisor') do
-  owner node[:scalr_server][:supervisor][:user]
-  mode 0755
-end
-
-directory etc_dir_for(node, 'supervisor') do
-  owner node[:scalr_server][:supervisor][:user]
-  mode  0755
-end
+# Supervisor configuration
 
 directory "#{etc_dir_for node, 'supervisor'}/conf.d" do
   owner node[:scalr_server][:supervisor][:user]
   mode  0755
+  recursive true
 end
 
 template "#{etc_dir_for node, 'supervisor'}/supervisord.conf" do
@@ -57,6 +46,18 @@ template "#{etc_dir_for node, 'supervisor'}/supervisord.conf" do
   mode  0644
   helpers(Scalr::PathHelper)
   notifies  :restart, 'service[scalr]', :immediately  # no-op if the init file isn't there yet (see above)
+end
+
+directory run_dir_for(node, 'supervisor') do
+  owner node[:scalr_server][:supervisor][:user]
+  mode 0755
+  recursive true
+end
+
+directory log_dir_for(node, 'supervisor') do
+  owner node[:scalr_server][:supervisor][:user]
+  mode 0755
+  recursive true
 end
 
 
@@ -78,7 +79,6 @@ case node['platform']
                     :run_dir => run_dir_for(node, 'supervisor')
                 })
       helpers(Scalr::PathHelper)
-      notifies  :restart, 'service[scalr]', :immediately  # Environment might change
     end
 
     service 'scalr' do

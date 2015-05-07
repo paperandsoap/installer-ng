@@ -27,9 +27,7 @@ LoadModule status_module            embedded/modules/mod_status.so
 LoadModule autoindex_module         embedded/modules/mod_autoindex.so
 LoadModule dir_module               embedded/modules/mod_dir.so
 LoadModule alias_module             embedded/modules/mod_alias.so
-<% if enable_module?(node, :app) %>
 LoadModule php5_module              embedded/modules/libphp5.so
-<% end %>
 
 <IfModule unixd_module>
   User    <%= node[:scalr_server][:app][:user] %>
@@ -57,8 +55,13 @@ LogLevel warn
 ErrorLog  <%= log_dir_for node, 'httpd' %>/web.error.log
 
 <IfModule log_config_module>
-  LogFormat "%a (for \"%{X-Forwarded-For}i\") %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
-  LogFormat "%a %l %u %t \"%r\" %>s %b" common
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+  LogFormat "%h %l %u %t \"%r\" %>s %b" common
+
+  <IfModule logio_module>
+    # You need to enable mod_logio.c to use %I and %O
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+  </IfModule>
 
   CustomLog <%= log_dir_for node, 'httpd' %>/web.access.log combined
 </IfModule>
@@ -95,11 +98,6 @@ EnableSendfile on
     <VirtualHost *:<%= web[:bind_port] %>>
       DocumentRoot <%= web[:root] %>
 
-      ErrorLog  <%= log_dir_for node, 'httpd' %>/web.<%= web[:name] %>.error.log
-      <IfModule log_config_module>
-            CustomLog <%= log_dir_for node, 'httpd' %>/web.<%= web[:name] %>.access.log combined
-      </IfModule>
-
       <Directory <%= web[:root] %>>
         Options -Indexes +FollowSymLinks +MultiViews
         AllowOverride All
@@ -110,9 +108,6 @@ EnableSendfile on
         Require all granted
       </Directory>
 
-      # NOTE: We do not use the RemoteIP Module here intentionally. The RemoteIP module consumes the X-Forwarded-For
-      # header, which we want to avoid, since the Scalr app will be consuming it itself.
-
     </VirtualHost>
 <% end %>
 
@@ -120,13 +115,6 @@ EnableSendfile on
 # Proxy #
 
 <% if enable_module?(node, :proxy) %>
-    LoadModule proxy_module                 embedded/modules/mod_proxy.so
-
-    LoadModule slotmem_shm_module           embedded/modules/mod_slotmem_shm.so
-    LoadModule proxy_balancer_module        embedded/modules/mod_proxy_balancer.so
-    LoadModule lbmethod_byrequests_module   embedded/modules/mod_lbmethod_byrequests.so
-
-    LoadModule proxy_http_module            embedded/modules/mod_proxy_http.so
 
     <% if node[:scalr_server][:proxy][:ssl_enable] %>
         LoadModule ssl_module embedded/modules/mod_ssl.so
@@ -138,13 +126,16 @@ EnableSendfile on
           SSLCertificateKeyFile <%= node[:scalr_server][:proxy][:ssl_key_path] %>
 
           <%= render 'httpd/_proxy_partial.erb' %>
-
-          ErrorLog  <%= log_dir_for node, 'httpd' %>/web.proxy-ssl.error.log
-          <IfModule log_config_module>
-                CustomLog <%= log_dir_for node, 'httpd' %>/web.proxy-ssl.access.log combined
-          </IfModule>
         </VirtualHost>
     <% end %>
+
+    LoadModule proxy_module                 embedded/modules/mod_proxy.so
+
+    LoadModule slotmem_shm_module           embedded/modules/mod_slotmem_shm.so
+    LoadModule proxy_balancer_module        embedded/modules/mod_proxy_balancer.so
+    LoadModule lbmethod_byrequests_module   embedded/modules/mod_lbmethod_byrequests.so
+
+    LoadModule proxy_http_module            embedded/modules/mod_proxy_http.so
 
     Listen <%= node[:scalr_server][:proxy][:bind_host] %>:<%= node[:scalr_server][:proxy][:bind_port] %>
 
@@ -155,10 +146,6 @@ EnableSendfile on
       <% else %>
         <%= render 'httpd/_proxy_partial.erb' %>
       <% end %>
-      ErrorLog  <%= log_dir_for node, 'httpd' %>/web.proxy.error.log
-      <IfModule log_config_module>
-            CustomLog <%= log_dir_for node, 'httpd' %>/web.proxy.access.log combined
-      </IfModule>
     </VirtualHost>
 
     <Proxy balancer://app>

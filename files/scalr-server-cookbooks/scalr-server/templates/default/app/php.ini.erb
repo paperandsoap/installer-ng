@@ -1938,35 +1938,19 @@ extension=yaml.so
 extension=zmq.so
 extension=memcached.so
 
-; Scalr :: Disable memleak reporting (turn it back on with app[:php_configuration])
-report_memleaks = Off
-
 ; Scalr :: Sessions
 ; View: https://github.com/php-memcached-dev/php-memcached/issues/47
 
 session.cookie_lifetime = <%= node[:scalr_server][:app][:session_cookie_lifetime] %>
-session.gc_maxlifetime = <%= 2 * (1 + node[:scalr_server][:app][:session_cookie_lifetime]) %>
 
 session.save_handler = memcached
-session.save_path = <%= memcached_servers(node).join(', ') %>
+session.save_path = "<%= node[:scalr_server][:app][:memcached_host] %>:<%= node[:scalr_server][:app][:memcached_port] %>"
 
-memcached.sess_binary = On
-
-<% if memcached_enable_sasl?(node) %>
 memcached.use_sasl = On
+memcached.sess_binary = On
 memcached.sess_sasl_username = <%= node[:scalr_server][:memcached][:username] %>
 memcached.sess_sasl_password = <%= node[:scalr_server][:memcached][:password] %>
-<% end %>
 
-<% if memcached_servers(node).length > 1 %>
-memcached.sess_remove_failed = 1
-<% end %>
-memcached.sess_number_of_replicas = 1
-memcached.store_retry_count = <%= 2 * memcached_servers(node).length %>
-memcached.sess_consistent_hash = On
-
-; Scalr :: Email
-sendmail_path = "<%= bin_dir_for(node, 'mail') %>/ssmtp -t"
 
 ; Scalr :: Specific settings
 
@@ -1977,6 +1961,3 @@ date.timezone = <%= node[:rackspace_timezone][:config][:tz] %>
 http.persistent.handles.limit = 0
 error_log = <%= log_dir_for node, 'php' %>/php-errors.log
 display_errors = On
-
-; Extra configuration. Modify using app[:php_configuration] = '...'
-<%= node[:scalr_server][:app][:php_configuration] %>
