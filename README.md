@@ -31,6 +31,8 @@ should ensure that the server you deploy Scalr to matches those requirements.
 
 For more information, review: [Required Network Configuration for Scalr][05].
 
+Scalr also has some memory and CPU requirements. For evaluations, choose a VM with 4GB of RAM like the m3.medium on AWS. For production, review: [Suggested Hardware Specifications][07].
+
 
 Step 1: Installation
 --------------------
@@ -95,5 +97,6 @@ We encourage you to review the following documentation entries:
   [00]: https://scalr-wiki.atlassian.net/wiki/x/QgAeAQ
   [01]: https://github.com/scalr/installer
   [05]: https://scalr-wiki.atlassian.net/wiki/x/CYA0
+  [07]: https://scalr-wiki.atlassian.net/wiki/x/KAA9AQ
   [10]: https://scalr-wiki.atlassian.net/wiki/x/fQAeAQ
   [20]: https://scalr-wiki.atlassian.net/wiki/x/RgAeAQ
