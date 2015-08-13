@@ -15,6 +15,7 @@ dependency 'zlib'
 dependency 'curl'
 dependency 'file'  # libmagic
 dependency 'php'
+dependency 'php-raphf'
 
 relative_path "pecl_http-#{version}"
 
