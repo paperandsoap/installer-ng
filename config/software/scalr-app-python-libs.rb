@@ -47,4 +47,8 @@ build do
           " --build #{build_dir}/pybuild" \
           ' --requirement ./requirements.txt', env: env
 
+  command "#{install_dir}/embedded/bin/pip install" \
+          " --build #{build_dir}/pybuild" \
+          ' apache-libcloud==0.17.0', env: env
+
 end
