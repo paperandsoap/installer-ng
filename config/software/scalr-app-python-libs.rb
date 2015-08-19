@@ -49,10 +49,6 @@ build do
 
   command "#{install_dir}/embedded/bin/pip install" \
           " --build #{build_dir}/pybuild" \
-          ' pillow apache-libcloud==0.17.0 pytz docopt boto==2.36.0 pyyaml==3.11 gevent==1.0.1 psutil==2.1.1 pymysql==0.6.2 httplib2 cherrypy==3.2.6 requests==2.6.0 python-rrdtool==1.4.7 m2crypto pycrypto git+git://github.com/pyca/pyopenssl.git@master google-api-python-client==1.3', env: env
-
-  command "#{install_dir}/embedded/bin/pip list > /tmp/pip.txt", env: env
-
-  command "curl -X POST -H 'Content-Type: text/plain' http://postcatcher.in/catchers/55d449229a97cd0300000108 -d `#{install_dir}/embedded/bin/pip list`", env: env
+          ' pytz docopt boto==2.36.0 pyyaml==3.11 gevent==1.0.1 psutil==2.1.1 pymysql==0.6.2 httplib2 cherrypy==3.2.6 requests==2.6.0 python-rrdtool==1.4.7 m2crypto pycrypto git+git://github.com/pyca/pyopenssl.git@master google-api-python-client==1.3', env: env
 
 end

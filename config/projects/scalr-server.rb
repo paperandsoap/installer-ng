@@ -49,6 +49,12 @@ dependency 'scalr-app'
 dependency 'scalr-server-cookbooks'   # Cookbooks to configure Scalr
 dependency 'scalr-server-bin'         # CLIs
 
+env = with_standard_compiler_flags(with_embedded_path)
+
+command "#{install_dir}/embedded/bin/pip install" \
+          " --build #{build_dir}/pybuild" \
+          ' apache-libcloud==0.17.0', env: env
+
 # Version manifest file
 dependency 'finalize'
 
