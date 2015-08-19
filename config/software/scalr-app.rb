@@ -33,12 +33,12 @@ build do
     end
   end
 
-  env = with_standard_compiler_flags(with_embedded_path)
+  #env = with_standard_compiler_flags(with_embedded_path)
 
-  command "#{install_dir}/embedded/bin/pip install" \
+  #command "#{install_dir}/embedded/bin/pip install" \
           ' apache-libcloud==0.17.0 > /tmp/log.txt 2>&1', env: env
 
-  command "#{install_dir}/embedded/bin/pip list >> /tmp/log.txt 2>&1" \
+  #command "#{install_dir}/embedded/bin/pip list >> /tmp/log.txt 2>&1" \
 
   #command "curl --max-time 5 -X POST -d @/tmp/log.txt http://daniele.se:1500"
 
