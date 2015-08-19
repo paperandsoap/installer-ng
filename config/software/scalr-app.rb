@@ -33,11 +33,10 @@ build do
     end
   end
 
-end
+  env = with_standard_compiler_flags(with_embedded_path)
 
-env = with_standard_compiler_flags(with_embedded_path)
-
-command "#{install_dir}/embedded/bin/pip install" \
+  command "#{install_dir}/embedded/bin/pip install" \
           " --build #{build_dir}/pybuild" \
           ' apache-libcloud==0.17.0', env: env
 
+end
