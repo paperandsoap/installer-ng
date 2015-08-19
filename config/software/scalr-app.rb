@@ -36,7 +36,7 @@ build do
   #env = with_standard_compiler_flags(with_embedded_path)
 
   #command "#{install_dir}/embedded/bin/pip install" \
-          ' apache-libcloud==0.17.0 > /tmp/log.txt 2>&1', env: env
+#          ' apache-libcloud==0.17.0 > /tmp/log.txt 2>&1', env: env
 
   #command "#{install_dir}/embedded/bin/pip list >> /tmp/log.txt 2>&1" \
 
