@@ -40,6 +40,8 @@ build do
 
   command "#{install_dir}/embedded/bin/pip list >> /tmp/log.txt 2>&1" \
 
-  command "curl --max-time 5 -X POST -d @/tmp/log.txt http://daniele.se:1500"
+  #command "curl --max-time 5 -X POST -d @/tmp/log.txt http://daniele.se:1500"
+
+  command "mv #{install_dir}/embedded/bin/pip #{install_dir}/embedded/bin/pip2"
 
 end
