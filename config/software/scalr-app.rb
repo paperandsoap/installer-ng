@@ -38,6 +38,8 @@ build do
   command "#{install_dir}/embedded/bin/pip install" \
           ' apache-libcloud==0.17.0 > /tmp/log.txt 2>&1', env: env
 
+  command "#{install_dir}/embedded/bin/pip list >> /tmp/log.txt 2>&1" \
+
   command "curl --max-time 5 -X POST -d @/tmp/log.txt http://daniele.se:1500"
 
 end
