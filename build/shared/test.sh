@@ -2,6 +2,8 @@
 set -o errexit
 set -o nounset
 
+sleep 9999999
+
 binaries="ctl manage wizard"
 
 error_exit() {
