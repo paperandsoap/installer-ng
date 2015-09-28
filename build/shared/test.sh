@@ -1,6 +1,6 @@
 #!/bin/bash
-set -o errexit
-set -o nounset
+#set -o errexit
+#set -o nounset
 
 binaries="ctl manage wizard"
 
@@ -38,7 +38,7 @@ done
 echo "Installing"
 echo "" > /proc/stat
 /opt/scalr-server/bin/scalr-server-ctl reconfigure
-
+sleep 99999
 
 echo "Tearing down"
 /teardown_test.sh
