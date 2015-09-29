@@ -37,7 +37,6 @@ done
 
 echo "Installing"
 /opt/scalr-server/bin/scalr-server-ctl reconfigure
-sleep 99999
 
 echo "Tearing down"
 /teardown_test.sh
