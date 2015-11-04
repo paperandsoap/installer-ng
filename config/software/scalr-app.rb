@@ -12,6 +12,9 @@ end
 
 
 build do
+  # Install dependencies using composer
+  command "#{bin_dir}/php #{bin_dir}/composer.phar install --no-dev"
+
   # Copy the code to the ./scalr dir.
   command "mkdir -p #{install_dir}/embedded/scalr"
   command "rsync -a --delete --exclude=.git --exclude=.gitignore --exclude=installer-ng --exclude=pybuild ./ #{install_dir}/embedded/scalr"
