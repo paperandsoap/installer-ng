@@ -13,7 +13,7 @@ end
 
 build do
   # Install dependencies using composer
-  command "#{bin_dir}/php #{bin_dir}/composer.phar install --no-dev"
+  command "#{install_dir}/embedded/bin/php #{install_dir}/embedded/bin/composer.phar install --no-dev"
 
   # Copy the code to the ./scalr dir.
   command "mkdir -p #{install_dir}/embedded/scalr"
