@@ -35,5 +35,5 @@ sed -i "s/__PLATFORM_VERSION__/${PLATFORM_VERSION}/g" "./Dockerfile"
 # Build #
 #########
 
-docker build -t "${DOCKER_IMG}" .
+docker build --no-cache -t "${DOCKER_IMG}" .
 echo "Built Docker Image: ${DOCKER_IMG}"
