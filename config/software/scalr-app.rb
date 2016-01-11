@@ -10,8 +10,8 @@ source :git => '__SCALR_APP_PATH__'
 end
 
 # Manually composer licenses
-license path: "vendor/google/apiclient/LICENSE"
-license path: "vendor/onelogin/php-saml/LICENSE"
+#license path: "vendor/google/apiclient/LICENSE"
+#license path: "vendor/onelogin/php-saml/LICENSE"
 
 build do
   # Install dependencies using composer
