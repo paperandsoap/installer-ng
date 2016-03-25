@@ -105,7 +105,6 @@ build do
           ' --enable-soap' \
           " --with-ldap=#{install_dir}/embedded" \
           " --with-ldap-sasl=#{install_dir}/embedded" \
-          ' --enable-opcache' \
           " --with-apxs2=#{install_dir}/embedded/bin/apxs" \
           ' --enable-fpm' \
           " --with-config-file-path=#{install_dir}/etc/php" \
