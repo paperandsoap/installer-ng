@@ -37,8 +37,6 @@ dependency 'libyaml'
 dependency 'python-m2crypto'
 
 build do
-  env = with_standard_compiler_flags(with_embedded_path)
-
   # Clean build dir
   command "rm -rf #{build_dir}/pybuild/*"
 
@@ -48,6 +46,6 @@ build do
   # Then, install the rest
   command "#{install_dir}/embedded/bin/pip install" \
           " --build #{build_dir}/pybuild" \
-          ' --requirement ./requirements.txt', env: env
+          ' --requirement ./requirements.txt'
 
 end
