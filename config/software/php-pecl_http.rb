@@ -1,5 +1,5 @@
 name 'php-pecl_http'
-default_version '2.5.6'
+default_version '2.5.3'
 
 source url: "http://pecl.php.net/get/pecl_http-#{version}.tgz"
 
@@ -13,10 +13,6 @@ end
 
 version '2.5.3' do
   source md5: 'faeaefd4c7800bcd9ced0883ebb3b733'
-end
-
-version '2.5.6' do
-  source md5: '40fff0e5536c5e80b44e68dd475f8c0a'
 end
 
 dependency 'zlib'
@@ -41,9 +37,4 @@ build do
           " --with-http-zlib-dir=#{install_dir}/embedded", env: env
   make env: env
   make 'install', env: env
-
-  #Add extension to php.ini
-  command "mkdir -p #{install_dir}/etc/php"
-  command "echo 'extension=http.so' >> #{install_dir}/etc/php/php.ini"
-
 end

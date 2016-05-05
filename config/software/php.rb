@@ -17,7 +17,7 @@
 
 
 name 'php'
-default_version '5.6.17'
+default_version '5.6.14'
 
 dependency 'zlib'
 dependency 'libedit'
@@ -67,10 +67,6 @@ version '5.6.14' do
         source md5: 'ae625e0cfcfdacea3e7a70a075e47155'
 end
 
-version '5.6.17' do
-        source md5: '9cbf226d0b5d852e66a0b7272368ecea'
-end
-
 relative_path "php-#{version}"
 
 license path: 'LICENSE'
@@ -110,8 +106,6 @@ build do
           ' --enable-fpm' \
           " --with-config-file-path=#{install_dir}/etc/php" \
           ' --with-fpm-user=scalr' \
-          ' --enable-bcmath' \
-          ' --enable-mbstring' \
           ' --with-fpm-group=scalr', env: env
 
   make "-j #{workers}", env: env
