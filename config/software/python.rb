@@ -16,7 +16,7 @@
 #
 
 name 'python'
-default_version '2.7.8'
+default_version '2.7.11'
 
 dependency 'gdbm'
 dependency 'ncurses'
@@ -30,12 +30,8 @@ dependency 'sqlite'
 
 source url: "https://www.python.org/ftp/python/#{version}/Python-#{version}.tgz"
 
-version '2.7.8' do
-  source md5: 'd4bca0159acb0b44a781292b5231936f'
-end
-
-version '2.7.9' do
-  source md5: '5eebcaa0030dc4061156d3429657fb83'
+version '2.7.11' do
+  source md5: '6b6076ec9e93f05dd63e47eb9c15728b'
 end
 
 relative_path "Python-#{version}"
